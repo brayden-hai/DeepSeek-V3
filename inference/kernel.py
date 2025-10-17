@@ -135,6 +135,7 @@ def weight_quant_kernel(x_ptr, y_ptr, s_ptr, M, N, BLOCK_SIZE: tl.constexpr):
     mask = (offs_m[:, None] < M) & (offs_n[None, :] < N)
     x = tl.load(x_ptr + offs, mask=mask).to(tl.float32)
     max_val = tl.max(tl.abs(x))
+    max_val = tl.maximum(max_val, 1e-4)
     s = max_val / 448.0
     y = x / s
     y = y.to(y_ptr.dtype.element_ty)
